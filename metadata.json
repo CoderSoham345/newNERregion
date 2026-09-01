@@ -1,0 +1,6 @@
+{
+  "name": "UttarPURV — Northeast India Safety, Road & Disaster Intelligence",
+  "description": "UttarPURV — Northeast India safety, road and disaster intelligence platform with real-time weather, landslide and flood risk, nearest police & medical emergency services.",
+  "requestFramePermissions": ["geolocation", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

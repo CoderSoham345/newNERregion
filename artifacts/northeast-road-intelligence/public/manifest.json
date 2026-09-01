@@ -1,0 +1,19 @@
+{
+  "name": "UttarPURV — NER Field Intelligence & Disaster Platform",
+  "short_name": "UttarPURV",
+  "description": "Northeast India Field Safety, Road Risk, Logistics Telemetry & Emergency Response System",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#064e3b",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["government", "navigation", "emergency", "logistics"]
+}
