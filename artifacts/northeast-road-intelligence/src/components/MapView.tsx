@@ -60,6 +60,19 @@ export const STATUS_COLORS: Record<string, string> = {
 
 export type BaseMapStyle = 'outdoor' | 'streets' | 'hybrid' | 'dark' | 'osm';
 
+const isValidCoord = (c: any): c is [number, number] => {
+  return (
+    Array.isArray(c) &&
+    c.length === 2 &&
+    typeof c[0] === 'number' &&
+    typeof c[1] === 'number' &&
+    !Number.isNaN(c[0]) &&
+    !Number.isNaN(c[1]) &&
+    Number.isFinite(c[0]) &&
+    Number.isFinite(c[1])
+  );
+};
+
 export const MapView: React.FC<MapViewProps> = ({
   className = 'h-[550px] w-full',
   onSelectSegment,
@@ -221,25 +234,30 @@ export const MapView: React.FC<MapViewProps> = ({
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    if (selectedRoadSegment && selectedRoadSegment.coordinates.length > 0) {
-      const bounds = L.latLngBounds(selectedRoadSegment.coordinates);
-      map.flyToBounds(bounds, { padding: [60, 60], maxZoom: 12, duration: 1.2 });
-      return;
+    if (selectedRoadSegment && Array.isArray(selectedRoadSegment.coordinates)) {
+      const validCoords = selectedRoadSegment.coordinates.filter(isValidCoord);
+      if (validCoords.length > 0) {
+        const bounds = L.latLngBounds(validCoords);
+        map.flyToBounds(bounds, { padding: [60, 60], maxZoom: 12, duration: 1.2 });
+        return;
+      }
     }
 
     if (selectedState !== 'All states' && STATES_DATA[selectedState as StateId]) {
       const st = STATES_DATA[selectedState as StateId];
       if (selectedDistrictId !== 'all') {
         const dist = st.districts.find((d) => d.id === selectedDistrictId);
-        if (dist) {
+        if (dist && isValidCoord(dist.center)) {
           map.flyTo(dist.center, 10, { duration: 1.2 });
           return;
         }
       }
-      map.flyTo(st.center, st.zoom, { duration: 1.2 });
-    } else {
-      map.flyTo([26.0, 92.5], 7, { duration: 1.2 });
+      if (st && isValidCoord(st.center)) {
+        map.flyTo(st.center, st.zoom, { duration: 1.2 });
+        return;
+      }
     }
+    map.flyTo([26.0, 92.5], 7, { duration: 1.2 });
   }, [selectedState, selectedDistrictId, selectedRoadSegment]);
 
   // Render UttarPURV Recommended, Original, and Alternative Routes on MapTiler
@@ -253,73 +271,84 @@ export const MapView: React.FC<MapViewProps> = ({
     const allCoords: [number, number][] = [];
 
     // 1. Draw Original Route (Red Dashed) if provided
-    if (originalRoute && originalRoute.coordinates.length > 0) {
-      const origLine = L.polyline(originalRoute.coordinates, {
-        color: '#dc2626',
-        weight: 5,
-        opacity: 0.85,
-        dashArray: '6, 8',
-      });
-      origLine.bindTooltip(`<strong>Original Route (Blocked/Risk)</strong><br/>${originalRoute.distance} · ${originalRoute.duration}`, { sticky: true });
-      origLine.addTo(groups.routes);
-      allCoords.push(...originalRoute.coordinates);
+    if (originalRoute && Array.isArray(originalRoute.coordinates)) {
+      const validCoords = originalRoute.coordinates.filter(isValidCoord);
+      if (validCoords.length > 0) {
+        const origLine = L.polyline(validCoords, {
+          color: '#dc2626',
+          weight: 5,
+          opacity: 0.85,
+          dashArray: '6, 8',
+        });
+        origLine.bindTooltip(`<strong>Original Route (Blocked/Risk)</strong><br/>${originalRoute.distance} · ${originalRoute.duration}`, { sticky: true });
+        origLine.addTo(groups.routes);
+        allCoords.push(...validCoords);
+      }
     }
 
     // 2. Draw Alternative Routes (Yellow/Orange)
     if (alternativeRoutes) {
       alternativeRoutes.forEach((alt) => {
-        if (alt.coordinates.length > 0) {
-          const altLine = L.polyline(alt.coordinates, {
-            color: '#ea580c',
-            weight: 4,
-            opacity: 0.8,
-          });
-          altLine.bindTooltip(`<strong>Alternative</strong>: ${alt.name}<br/>${alt.distance} · ${alt.duration}`, { sticky: true });
-          altLine.addTo(groups.routes);
-          allCoords.push(...alt.coordinates);
+        if (alt && Array.isArray(alt.coordinates)) {
+          const validCoords = alt.coordinates.filter(isValidCoord);
+          if (validCoords.length > 0) {
+            const altLine = L.polyline(validCoords, {
+              color: '#ea580c',
+              weight: 4,
+              opacity: 0.8,
+            });
+            altLine.bindTooltip(`<strong>Alternative</strong>: ${alt.name}<br/>${alt.distance} · ${alt.duration}`, { sticky: true });
+            altLine.addTo(groups.routes);
+            allCoords.push(...validCoords);
+          }
         }
       });
     }
 
     // 3. Draw Recommended Route (Green, Prominent)
-    if (recommendedRoute && recommendedRoute.coordinates.length > 0) {
-      const recLine = L.polyline(recommendedRoute.coordinates, {
-        color: '#16a34a',
-        weight: 7,
-        opacity: 0.95,
-        lineCap: 'round',
-        lineJoin: 'round',
-      });
-      recLine.bindTooltip(`<strong>🟢 RECOMMENDED ROUTE</strong>: ${recommendedRoute.name}<br/>${recommendedRoute.distance} · ${recommendedRoute.duration}`, { sticky: true });
-      recLine.addTo(groups.routes);
-      allCoords.push(...recommendedRoute.coordinates);
+    if (recommendedRoute && Array.isArray(recommendedRoute.coordinates)) {
+      const validCoords = recommendedRoute.coordinates.filter(isValidCoord);
+      if (validCoords.length > 0) {
+        const recLine = L.polyline(validCoords, {
+          color: '#16a34a',
+          weight: 7,
+          opacity: 0.95,
+          lineCap: 'round',
+          lineJoin: 'round',
+        });
+        recLine.bindTooltip(`<strong>🟢 RECOMMENDED ROUTE</strong>: ${recommendedRoute.name}<br/>${recommendedRoute.distance} · ${recommendedRoute.duration}`, { sticky: true });
+        recLine.addTo(groups.routes);
+        allCoords.push(...validCoords);
+      }
     }
 
     // 4. Draw Blocked Segment Markers (🚨)
     if (blockedSegments) {
       blockedSegments.forEach((seg) => {
-        const blockIconHtml = `
-          <div class="relative flex items-center justify-center">
-            <span class="absolute w-9 h-9 rounded-full bg-red-500/50 animate-ping"></span>
-            <div class="w-7 h-7 rounded-full bg-red-600 border-2 border-white flex items-center justify-center text-white font-black text-xs shadow-lg">
-              🚨
+        if (seg && isValidCoord(seg.coords)) {
+          const blockIconHtml = `
+            <div class="relative flex items-center justify-center">
+              <span class="absolute w-9 h-9 rounded-full bg-red-500/50 animate-ping"></span>
+              <div class="w-7 h-7 rounded-full bg-red-600 border-2 border-white flex items-center justify-center text-white font-black text-xs shadow-lg">
+                🚨
+              </div>
             </div>
-          </div>
-        `;
-        const icon = L.divIcon({
-          html: blockIconHtml,
-          className: 'block-marker-icon',
-          iconSize: [28, 28],
-          iconAnchor: [14, 14],
-        });
-        const marker = L.marker(seg.coords, { icon });
-        marker.bindPopup(`<div class="p-1 text-slate-900"><strong class="text-red-600 font-bold">🚨 ROAD BLOCKED</strong><br/>${seg.title}<br/><span class="text-xs text-slate-600">${seg.road}</span></div>`);
-        marker.addTo(groups.routes);
+          `;
+          const icon = L.divIcon({
+            html: blockIconHtml,
+            className: 'block-marker-icon',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+          });
+          const marker = L.marker(seg.coords, { icon });
+          marker.bindPopup(`<div class="p-1 text-slate-900"><strong class="text-red-600 font-bold">🚨 ROAD BLOCKED</strong><br/>${seg.title}<br/><span class="text-xs text-slate-600">${seg.road}</span></div>`);
+          marker.addTo(groups.routes);
+        }
       });
     }
 
     // 5. Draw Origin Marker (🟢)
-    if (originCoords) {
+    if (originCoords && isValidCoord(originCoords)) {
       const originIconHtml = `
         <div class="flex items-center justify-center">
           <div class="w-8 h-8 rounded-full bg-emerald-600 border-3 border-white flex items-center justify-center text-white font-black text-xs shadow-xl">
@@ -340,7 +369,7 @@ export const MapView: React.FC<MapViewProps> = ({
     }
 
     // 6. Draw Destination Marker (🏁)
-    if (destinationCoords) {
+    if (destinationCoords && isValidCoord(destinationCoords)) {
       const destIconHtml = `
         <div class="flex items-center justify-center">
           <div class="w-8 h-8 rounded-full bg-blue-600 border-3 border-white flex items-center justify-center text-white font-black text-xs shadow-xl">
@@ -377,11 +406,15 @@ export const MapView: React.FC<MapViewProps> = ({
     if (!mapLayers.roadStatus) return;
 
     filteredRoadSegments.forEach((segment) => {
+      if (!segment || !Array.isArray(segment.coordinates)) return;
+      const validCoords = segment.coordinates.filter(isValidCoord);
+      if (validCoords.length === 0) return;
+
       const isSelected = selectedRoadSegment?.id === segment.id;
       const statusKey = segment.roadStatus || 'Accessible';
       const color = STATUS_COLORS[statusKey] || STATUS_COLORS['Accessible'];
 
-      const polyline = L.polyline(segment.coordinates, {
+      const polyline = L.polyline(validCoords, {
         color: color,
         weight: isSelected ? 8 : segment.roadStatus === 'Blocked' ? 6 : 5,
         opacity: isSelected ? 1 : 0.9,
@@ -418,7 +451,7 @@ export const MapView: React.FC<MapViewProps> = ({
     if (!mapLayers.incidents) return;
 
     filteredIncidents.forEach((inc) => {
-      if (inc.status === 'Resolved') return;
+      if (!inc || inc.status === 'Resolved' || !isValidCoord(inc.coords)) return;
 
       const isCritical = inc.severity === 'Critical';
       const isFieldReport = !inc.verifiedBy;
@@ -483,6 +516,7 @@ export const MapView: React.FC<MapViewProps> = ({
     if (!demoMode) return;
 
     filteredVehicles.forEach((veh) => {
+      if (!veh || !isValidCoord(veh.currentCoords)) return;
       const isAmbulance = veh.type === 'Emergency Ambulance';
 
       const iconHtml = `
@@ -537,6 +571,7 @@ export const MapView: React.FC<MapViewProps> = ({
     if (!mapLayers.infrastructure) return;
 
     infrastructure.forEach((infra) => {
+      if (!infra || !isValidCoord(infra.coords)) return;
       const isHospital = infra.type === 'Hospital';
       const iconHtml = `
         <div class="w-6 h-6 rounded-md flex items-center justify-center text-white shadow-xs border border-white ${

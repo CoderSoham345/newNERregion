@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useOperating, type UserRole } from '../context/OperatingContext';
+import { LANGUAGES, type SupportedLanguage } from '../data/translations';
 import {
   Shield,
   Phone,
@@ -12,15 +13,16 @@ import {
   Sparkles,
   Smartphone,
   ChevronLeft,
+  Globe,
 } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [, setLocation] = useLocation();
-  const { loginUser, userProfile } = useOperating();
+  const { loginUser, userProfile, currentLanguage, setLanguage } = useOperating();
 
   // Login steps: 'phone' | 'otp'
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
-  const [mobileNumber, setMobileNumber] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('9876543210');
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -163,6 +165,30 @@ export const LoginPage: React.FC = () => {
         {/* Main Card */}
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-slate-100">
           
+          {/* Language Selector Bar */}
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs">
+            <div className="flex items-center gap-1.5 text-slate-400 font-semibold">
+              <Globe className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Language:</span>
+            </div>
+            <div className="flex items-center gap-1">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => setLanguage(lang.code)}
+                  className={`px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    currentLanguage === lang.code
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                  }`}
+                >
+                  {lang.nativeName}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Brand Header */}
           <div className="text-center space-y-2">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 mb-1">
