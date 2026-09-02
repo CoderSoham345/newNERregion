@@ -69,7 +69,11 @@ const isValidCoord = (c: any): c is [number, number] => {
     !Number.isNaN(c[0]) &&
     !Number.isNaN(c[1]) &&
     Number.isFinite(c[0]) &&
-    Number.isFinite(c[1])
+    Number.isFinite(c[1]) &&
+    c[0] >= -90 &&
+    c[0] <= 90 &&
+    c[1] >= -180 &&
+    c[1] <= 180
   );
 };
 
@@ -156,59 +160,97 @@ export const MapView: React.FC<MapViewProps> = ({
 
   // Initialize Leaflet Map
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    const container = mapContainerRef.current;
+    if (!container) return;
     if (mapInstanceRef.current) return;
 
-    // Default center to North East India coordinates
-    const map = L.map(mapContainerRef.current, {
-      center: [26.0, 92.5],
-      zoom: 7,
-      minZoom: 5,
-      maxZoom: 18,
-      zoomControl: false,
-      attributionControl: false,
-    });
+    // Safety: prevent duplicate initialization if container has leftover leaflet id
+    if ((container as any)._leaflet_id) {
+      delete (container as any)._leaflet_id;
+    }
 
-    // Custom attribution
-    L.control
-      .attribution({
-        position: 'bottomright',
-        prefix:
-          '<a href="https://www.maptiler.com/" target="_blank" rel="noopener">MapTiler</a> | <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
-      })
-      .addTo(map);
+    let map: L.Map | null = null;
+    try {
+      // Default center to North East India coordinates
+      map = L.map(container, {
+        center: [26.0, 92.5],
+        zoom: 7,
+        minZoom: 5,
+        maxZoom: 18,
+        zoomControl: false,
+        attributionControl: false,
+      });
 
-    // Initial base tile layer
-    const initialStyle: BaseMapStyle = darkMode ? 'dark' : 'outdoor';
-    setBaseMapStyle(initialStyle);
-    const tileLayer = L.tileLayer(getTileUrl(initialStyle), {
-      maxZoom: 18,
-      tileSize: 512,
-      zoomOffset: -1,
-      crossOrigin: true,
-    }).addTo(map);
+      // Custom attribution
+      L.control
+        .attribution({
+          position: 'bottomright',
+          prefix:
+            '<a href="https://www.maptiler.com/" target="_blank" rel="noopener">MapTiler</a> | <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>',
+        })
+        .addTo(map);
 
-    tileLayerRef.current = tileLayer;
+      // Initial base tile layer
+      const initialStyle: BaseMapStyle = darkMode ? 'dark' : 'outdoor';
+      setBaseMapStyle(initialStyle);
+      const tileLayer = L.tileLayer(getTileUrl(initialStyle), {
+        maxZoom: 18,
+        tileSize: 512,
+        zoomOffset: -1,
+        crossOrigin: true,
+      }).addTo(map);
 
-    // Create Layer Groups
-    const roadsGroup = L.layerGroup().addTo(map);
-    const incidentsGroup = L.layerGroup().addTo(map);
-    const vehiclesGroup = L.layerGroup().addTo(map);
-    const infraGroup = L.layerGroup().addTo(map);
-    const routesGroup = L.layerGroup().addTo(map);
+      tileLayerRef.current = tileLayer;
 
-    layersGroupRef.current = {
-      roads: roadsGroup,
-      incidents: incidentsGroup,
-      vehicles: vehiclesGroup,
-      infrastructure: infraGroup,
-      routes: routesGroup,
-    };
+      // Create Layer Groups
+      const roadsGroup = L.layerGroup().addTo(map);
+      const incidentsGroup = L.layerGroup().addTo(map);
+      const vehiclesGroup = L.layerGroup().addTo(map);
+      const infraGroup = L.layerGroup().addTo(map);
+      const routesGroup = L.layerGroup().addTo(map);
 
-    mapInstanceRef.current = map;
+      layersGroupRef.current = {
+        roads: roadsGroup,
+        incidents: incidentsGroup,
+        vehicles: vehiclesGroup,
+        infrastructure: infraGroup,
+        routes: routesGroup,
+      };
+
+      mapInstanceRef.current = map;
+
+      // Invalidate map size after paint to ensure correct display on small mobile screens
+      setTimeout(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      }, 200);
+    } catch (e) {
+      console.warn('Leaflet map initialization skipped or caught:', e);
+    }
+
+    // Setup ResizeObserver for responsive resizing on Android mobile
+    let resizeObserver: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined' && container) {
+      resizeObserver = new ResizeObserver(() => {
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.invalidateSize();
+        }
+      });
+      resizeObserver.observe(container);
+    }
 
     return () => {
-      map.remove();
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+      if (map) {
+        try {
+          map.remove();
+        } catch {
+          // ignore cleanup errors
+        }
+      }
       mapInstanceRef.current = null;
     };
   }, []);
@@ -217,16 +259,24 @@ export const MapView: React.FC<MapViewProps> = ({
   useEffect(() => {
     if (!mapInstanceRef.current) return;
     if (tileLayerRef.current) {
-      mapInstanceRef.current.removeLayer(tileLayerRef.current);
+      try {
+        mapInstanceRef.current.removeLayer(tileLayerRef.current);
+      } catch {
+        // ignore
+      }
     }
-    const newTileLayer = L.tileLayer(getTileUrl(baseMapStyle), {
-      maxZoom: 18,
-      tileSize: 512,
-      zoomOffset: -1,
-      crossOrigin: true,
-    }).addTo(mapInstanceRef.current);
+    try {
+      const newTileLayer = L.tileLayer(getTileUrl(baseMapStyle), {
+        maxZoom: 18,
+        tileSize: 512,
+        zoomOffset: -1,
+        crossOrigin: true,
+      }).addTo(mapInstanceRef.current);
 
-    tileLayerRef.current = newTileLayer;
+      tileLayerRef.current = newTileLayer;
+    } catch (e) {
+      console.warn('Failed to update tile layer:', e);
+    }
   }, [baseMapStyle, darkMode]);
 
   // Handle State / District / Segment FlyTo
@@ -234,30 +284,36 @@ export const MapView: React.FC<MapViewProps> = ({
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    if (selectedRoadSegment && Array.isArray(selectedRoadSegment.coordinates)) {
-      const validCoords = selectedRoadSegment.coordinates.filter(isValidCoord);
-      if (validCoords.length > 0) {
-        const bounds = L.latLngBounds(validCoords);
-        map.flyToBounds(bounds, { padding: [60, 60], maxZoom: 12, duration: 1.2 });
-        return;
+    try {
+      if (selectedRoadSegment && Array.isArray(selectedRoadSegment.coordinates)) {
+        const validCoords = selectedRoadSegment.coordinates.filter(isValidCoord);
+        if (validCoords.length > 0) {
+          const bounds = L.latLngBounds(validCoords);
+          if (bounds.isValid()) {
+            map.flyToBounds(bounds, { padding: [60, 60], maxZoom: 12, duration: 1.2 });
+            return;
+          }
+        }
       }
-    }
 
-    if (selectedState !== 'All states' && STATES_DATA[selectedState as StateId]) {
-      const st = STATES_DATA[selectedState as StateId];
-      if (selectedDistrictId !== 'all') {
-        const dist = st.districts.find((d) => d.id === selectedDistrictId);
-        if (dist && isValidCoord(dist.center)) {
-          map.flyTo(dist.center, 10, { duration: 1.2 });
+      if (selectedState !== 'All states' && STATES_DATA[selectedState as StateId]) {
+        const st = STATES_DATA[selectedState as StateId];
+        if (selectedDistrictId !== 'all') {
+          const dist = st.districts.find((d) => d.id === selectedDistrictId);
+          if (dist && isValidCoord(dist.center)) {
+            map.flyTo(dist.center, 10, { duration: 1.2 });
+            return;
+          }
+        }
+        if (st && isValidCoord(st.center)) {
+          map.flyTo(st.center, st.zoom, { duration: 1.2 });
           return;
         }
       }
-      if (st && isValidCoord(st.center)) {
-        map.flyTo(st.center, st.zoom, { duration: 1.2 });
-        return;
-      }
+      map.flyTo([26.0, 92.5], 7, { duration: 1.2 });
+    } catch (e) {
+      console.warn('Map flyTo failed:', e);
     }
-    map.flyTo([26.0, 92.5], 7, { duration: 1.2 });
   }, [selectedState, selectedDistrictId, selectedRoadSegment]);
 
   // Render UttarPURV Recommended, Original, and Alternative Routes on MapTiler
@@ -391,8 +447,14 @@ export const MapView: React.FC<MapViewProps> = ({
 
     // 7. Auto-fit bounds to complete route
     if (allCoords.length > 0) {
-      const bounds = L.latLngBounds(allCoords);
-      map.fitBounds(bounds, { padding: [60, 60], maxZoom: 13, duration: 1.2 });
+      try {
+        const bounds = L.latLngBounds(allCoords);
+        if (bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [60, 60], maxZoom: 13, duration: 1.2 });
+        }
+      } catch (e) {
+        console.warn('Failed to fit route bounds:', e);
+      }
     }
   }, [recommendedRoute, originalRoute, alternativeRoutes, blockedSegments, originCoords, destinationCoords, originName, destinationName]);
 

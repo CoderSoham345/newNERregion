@@ -248,20 +248,45 @@ const LOCAL_STORAGE_DEMO_KEY = 'uttarpurv_demo_mode';
 const LOCAL_STORAGE_LANG_KEY = 'uttarpurv_language_v1';
 const LOCAL_STORAGE_CITIZEN_KEY = 'uttarpurv_citizen_mode_v1';
 
+function safeStorageGet(key: string): string | null {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(key);
+    }
+  } catch (e) {
+    console.warn(`Could not read ${key} from localStorage:`, e);
+  }
+  return null;
+}
+
+function safeStorageSet(key: string, value: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  } catch (e) {
+    console.warn(`Could not write ${key} to localStorage:`, e);
+  }
+}
+
 export const OperatingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Multilingual Language State
   const [currentLanguage, setCurrentLanguageState] = useState<SupportedLanguage>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_LANG_KEY) || localStorage.getItem('uttarpurv_lang');
-    if (saved && (saved === 'en' || saved === 'hi' || saved === 'as' || saved === 'bn' || saved === 'ne' || saved === 'mr')) {
-      return saved as SupportedLanguage;
+    try {
+      const saved = safeStorageGet(LOCAL_STORAGE_LANG_KEY) || safeStorageGet('uttarpurv_lang');
+      if (saved && (saved === 'en' || saved === 'hi' || saved === 'as' || saved === 'bn' || saved === 'ne' || saved === 'mr')) {
+        return saved as SupportedLanguage;
+      }
+    } catch {
+      // fallback
     }
     return 'en';
   });
 
   const setLanguage = useCallback((lang: SupportedLanguage) => {
     setCurrentLanguageState(lang);
-    localStorage.setItem(LOCAL_STORAGE_LANG_KEY, lang);
-    localStorage.setItem('uttarpurv_lang', lang);
+    safeStorageSet(LOCAL_STORAGE_LANG_KEY, lang);
+    safeStorageSet('uttarpurv_lang', lang);
   }, []);
 
   const t = useCallback((key: string, defaultVal?: string): string => {
@@ -278,13 +303,17 @@ export const OperatingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Citizen Mode vs Government Command Center Mode
   const [isCitizenMode, setIsCitizenModeState] = useState<boolean>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_CITIZEN_KEY);
-    return saved ? JSON.parse(saved) : false;
+    try {
+      const saved = safeStorageGet(LOCAL_STORAGE_CITIZEN_KEY);
+      return saved ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
   });
 
   const setCitizenMode = useCallback((enabled: boolean) => {
     setIsCitizenModeState(enabled);
-    localStorage.setItem(LOCAL_STORAGE_CITIZEN_KEY, JSON.stringify(enabled));
+    safeStorageSet(LOCAL_STORAGE_CITIZEN_KEY, JSON.stringify(enabled));
   }, []);
 
   const toggleCitizenMode = useCallback(() => {
@@ -302,15 +331,25 @@ export const OperatingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Global Modes (Demo Mode defaults to false for real-data honesty)
   const [demoMode, setDemoModeState] = useState<boolean>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_DEMO_KEY);
-    return saved ? JSON.parse(saved) : false;
+    try {
+      const saved = safeStorageGet(LOCAL_STORAGE_DEMO_KEY);
+      return saved ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
   });
   const [emergencyMode, setEmergencyModeState] = useState<boolean>(false);
   const [darkMode, setDarkModeState] = useState<boolean>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_THEME_KEY);
-    return saved ? JSON.parse(saved) : false;
+    try {
+      const saved = safeStorageGet(LOCAL_STORAGE_THEME_KEY);
+      return saved ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
   });
-  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+  const [isOnline, setIsOnline] = useState<boolean>(() => {
+    return typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean' ? navigator.onLine : true;
+  });
 
   // Live Weather & Device GPS States
   const [liveWeather, setLiveWeather] = useState<LiveWeatherResponse | null>(null);
@@ -337,7 +376,7 @@ export const OperatingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // User Profile
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_PROFILE_KEY);
+    const saved = safeStorageGet(LOCAL_STORAGE_PROFILE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -368,13 +407,21 @@ export const OperatingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [roadSegments, setRoadSegments] = useState<RoadSegment[]>(INITIAL_SEGMENTS);
   const [highways] = useState<Highway[]>(INITIAL_HIGHWAYS);
   const [cargoList, setCargoList] = useState<CargoItem[]>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_CARGO_KEY);
-    return saved ? JSON.parse(saved) : INITIAL_CARGO;
+    try {
+      const saved = safeStorageGet(LOCAL_STORAGE_CARGO_KEY);
+      return saved ? JSON.parse(saved) : INITIAL_CARGO;
+    } catch {
+      return INITIAL_CARGO;
+    }
   });
   const [vehicles, setVehicles] = useState<LiveVehicle[]>(INITIAL_VEHICLES);
   const [incidents, setIncidents] = useState<RoadIncident[]>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_INCIDENTS_KEY);
-    return saved ? JSON.parse(saved) : INITIAL_INCIDENTS;
+    try {
+      const saved = safeStorageGet(LOCAL_STORAGE_INCIDENTS_KEY);
+      return saved ? JSON.parse(saved) : INITIAL_INCIDENTS;
+    } catch {
+      return INITIAL_INCIDENTS;
+    }
   });
   const [alerts, setAlerts] = useState<SystemAlert[]>(INITIAL_ALERTS);
   const [news] = useState<NerNewsItem[]>(NER_SITUATION_NEWS);
@@ -384,7 +431,7 @@ export const OperatingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const [citizenReports, setCitizenReports] = useState<CitizenReport[]>(() => {
     try {
-      const saved = localStorage.getItem('uttarpurv_citizen_reports_v1');
+      const saved = safeStorageGet('uttarpurv_citizen_reports_v1');
       return saved ? JSON.parse(saved) : INITIAL_CITIZEN_REPORTS;
     } catch {
       return INITIAL_CITIZEN_REPORTS;
@@ -552,7 +599,7 @@ export const OperatingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Theme Sync
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_THEME_KEY, JSON.stringify(darkMode));
+    safeStorageSet(LOCAL_STORAGE_THEME_KEY, JSON.stringify(darkMode));
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -606,15 +653,15 @@ export const OperatingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Sync state changes to storage
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_INCIDENTS_KEY, JSON.stringify(incidents));
+    safeStorageSet(LOCAL_STORAGE_INCIDENTS_KEY, JSON.stringify(incidents));
   }, [incidents]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_CARGO_KEY, JSON.stringify(cargoList));
+    safeStorageSet(LOCAL_STORAGE_CARGO_KEY, JSON.stringify(cargoList));
   }, [cargoList]);
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_PROFILE_KEY, JSON.stringify(userProfile));
+    safeStorageSet(LOCAL_STORAGE_PROFILE_KEY, JSON.stringify(userProfile));
   }, [userProfile]);
 
   // Live Vehicle Telemetry & GPS Sim Ticker — ONLY EXECUTES IF DEMO MODE IS ACTIVATED
