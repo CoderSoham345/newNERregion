@@ -345,11 +345,11 @@ export const CitizenDashboard: React.FC = () => {
 
             <div className="p-4 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900/50 rounded-xl space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-sky-900 dark:text-sky-200">{liveWeather?.locationName || 'Guwahati, Assam'}</span>
+                <span className="text-xs font-bold text-sky-900 dark:text-sky-200">Guwahati, Assam (NER Hub)</span>
                 <span className="text-sm font-black font-mono text-sky-950 dark:text-white">{liveWeather?.temperature ?? 28}°C</span>
               </div>
               <p className="text-xs text-sky-800 dark:text-sky-300 font-medium">
-                Condition: {liveWeather?.condition || 'Partly Cloudy'} • Rain: {liveWeather?.precipitation ?? 0} mm
+                Condition: {liveWeather?.weatherDescription || 'Partly Cloudy'} • Rain: {liveWeather?.rainLast1h ?? 0} mm/h
               </p>
             </div>
           </div>
@@ -434,7 +434,7 @@ export const CitizenDashboard: React.FC = () => {
                       {rep.status}
                     </span>
                   </div>
-                  <p className="text-slate-600 dark:text-slate-300 truncate font-medium">{rep.issueType} • {rep.location}</p>
+                  <p className="text-slate-600 dark:text-slate-300 truncate font-medium">{rep.category} • {rep.locationName}</p>
                 </div>
               ))}
             </div>

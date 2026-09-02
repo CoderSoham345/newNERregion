@@ -3,28 +3,21 @@
  * Seamlessly interfaces with the Express / Vercel Serverless Backend and Supabase PostgreSQL
  */
 
-export const API_BASE_URL = (() => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
-  if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
-    return envUrl.replace(/\/+$/, '');
-  }
-  // Default to the dedicated Vercel production API or local relative path
-  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
-    return ''; // Relative path on same domain, or use deployed API
-  }
-  return 'https://northeast-road-intelligence156-api.vercel.app';
-})();
+import { getApiBaseUrl } from './apiConfig';
+
+export const API_BASE_URL = getApiBaseUrl();
 
 function getEndpoint(path: string): string {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  if (!API_BASE_URL) {
+  const baseUrl = getApiBaseUrl();
+  if (!baseUrl) {
     return normalizedPath;
   }
   // If base url already ends with /api and path starts with /api, avoid duplication
-  if (API_BASE_URL.endsWith('/api') && normalizedPath.startsWith('/api')) {
-    return `${API_BASE_URL}${normalizedPath.substring(4)}`;
+  if (baseUrl.endsWith('/api') && normalizedPath.startsWith('/api')) {
+    return `${baseUrl}${normalizedPath.substring(4)}`;
   }
-  return `${API_BASE_URL}${normalizedPath}`;
+  return `${baseUrl}${normalizedPath}`;
 }
 
 async function safeFetch<T>(path: string, options?: RequestInit): Promise<{ success: boolean; data?: T; error?: string }> {
