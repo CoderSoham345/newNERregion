@@ -56,6 +56,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const isCollapsed = collapsed !== undefined ? collapsed : internalCollapsed;
   const handleToggleCollapse = onToggleCollapse || (() => setInternalCollapsed(prev => !prev));
 
+  const isCitizen = userProfile.role === 'Citizen';
+
   return (
     <aside
       aria-label="Sidebar Navigation"
@@ -72,7 +74,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!isCollapsed && (
             <div className="truncate">
               <div className="text-xs font-black tracking-wider text-white uppercase">UttarPURV</div>
-              <div className="text-[9px] text-emerald-400 font-mono truncate">NER Road Intelligence</div>
+              <div className="text-[9px] text-emerald-400 font-mono truncate">
+                {isCitizen ? 'Citizen Portal' : 'NER Road Intelligence'}
+              </div>
             </div>
           )}
         </div>
@@ -90,218 +94,308 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }`}
         >
           <LayoutDashboard className={`w-4 h-4 shrink-0 ${location === '/' ? 'text-white' : 'text-slate-400'}`} />
-          {!isCollapsed && <span className="truncate flex-1">Dashboard</span>}
+          {!isCollapsed && <span className="truncate flex-1">{isCitizen ? 'Citizen Dashboard' : 'Dashboard'}</span>}
         </Link>
       </div>
 
       {/* Navigation List grouped as per reference */}
       <div className="flex-1 overflow-y-auto py-3 px-2.5 space-y-4 custom-scrollbar">
         
-        {/* OPERATIONS */}
-        <div className="space-y-0.5">
-          {!isCollapsed && (
-            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-3 py-1">
-              OPERATIONS
-            </div>
-          )}
-
-          <Link
-            href="/map"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/map'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Map className={`w-4 h-4 shrink-0 ${location === '/map' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Map & Routes</span>}
-          </Link>
-
-          <Link
-            href="/routes"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/routes' || location === '/ai-routes'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Navigation className={`w-4 h-4 shrink-0 ${location === '/routes' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">AI Safe Routes</span>}
-          </Link>
-
-          <Link
-            href="/disaster"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/disaster' || location === '/alerts'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Flame className={`w-4 h-4 shrink-0 ${location === '/disaster' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Incidents</span>}
-            {!isCollapsed && criticalIncidentsCount > 0 && (
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-red-600 text-white">
-                {criticalIncidentsCount}
-              </span>
-            )}
-          </Link>
-
-          <Link
-            href="/report"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/report'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <AlertOctagon className={`w-4 h-4 shrink-0 ${location === '/report' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Report Incident</span>}
-          </Link>
-
-          <Link
-            href="/cargo"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/cargo' || location === '/my-cargo'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Truck className={`w-4 h-4 shrink-0 ${location === '/cargo' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Logistics</span>}
-          </Link>
-
-          <Link
-            href="/my-cargo"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/my-cargo' || location === '/track-delivery'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Radio className={`w-4 h-4 shrink-0 ${location === '/my-cargo' || location === '/track-delivery' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Track Delivery</span>}
-          </Link>
-        </div>
-
-        {/* INTELLIGENCE */}
-        <div className="space-y-0.5 pt-2 border-t border-slate-800/80">
-          {!isCollapsed && (
-            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-3 py-1">
-              INTELLIGENCE
-            </div>
-          )}
-
-          <Link
-            href="/weather"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/weather'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <CloudRain className={`w-4 h-4 shrink-0 ${location === '/weather' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Weather & Risk</span>}
-          </Link>
-
-          <Link
-            href="/landslide-risk"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/landslide-risk'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Mountain className={`w-4 h-4 shrink-0 ${location === '/landslide-risk' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Landslide Intelligence</span>}
-          </Link>
-
-          <Link
-            href="/flood-risk"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/flood-risk'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Waves className={`w-4 h-4 shrink-0 ${location === '/flood-risk' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Flood Intelligence</span>}
-          </Link>
-        </div>
-
-        {/* MORE */}
-        <div className="space-y-0.5 pt-2 border-t border-slate-800/80">
-          {!isCollapsed && (
-            <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-3 py-1">
-              MORE
-            </div>
-          )}
-
-          <Link
-            href="/helplines"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/helplines'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <PhoneCall className={`w-4 h-4 shrink-0 ${location === '/helplines' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Emergency Directory</span>}
-          </Link>
-
-          <Link
-            href="/reports/track"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/reports/track'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <FileText className={`w-4 h-4 shrink-0 ${location === '/reports/track' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Reports</span>}
-          </Link>
-
-          <Link
-            href="/governance"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/governance'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <ShieldCheck className={`w-4 h-4 shrink-0 ${location === '/governance' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Authority Room</span>}
-          </Link>
-
-          <Link
-            href="/data-sources"
-            onClick={onCloseMobile}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/data-sources'
-                ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                : 'hover:bg-slate-800 text-slate-300 hover:text-white'
-            }`}
-          >
-            <Database className={`w-4 h-4 shrink-0 ${location === '/data-sources' ? 'text-white' : 'text-slate-400'}`} />
-            {!isCollapsed && <span className="truncate flex-1">Sync Center</span>}
+        {isCitizen ? (
+          /* CITIZEN NAVIGATION */
+          <div className="space-y-0.5">
             {!isCollapsed && (
-              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-600 text-white">
-                3
-              </span>
+              <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-3 py-1">
+                PUBLIC SERVICES
+              </div>
             )}
-          </Link>
-        </div>
+
+            <Link
+              href="/map"
+              onClick={onCloseMobile}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                location === '/map' ? 'bg-emerald-600 text-white shadow-sm font-bold' : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+              }`}
+            >
+              <Map className="w-4 h-4 shrink-0 text-slate-400" />
+              {!isCollapsed && <span className="truncate flex-1">Road & Safety Status</span>}
+            </Link>
+
+            <Link
+              href="/report"
+              onClick={onCloseMobile}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                location === '/report' ? 'bg-emerald-600 text-white shadow-sm font-bold' : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+              }`}
+            >
+              <AlertOctagon className="w-4 h-4 shrink-0 text-slate-400" />
+              {!isCollapsed && <span className="truncate flex-1">Report Road Issue</span>}
+            </Link>
+
+            <Link
+              href="/routes"
+              onClick={onCloseMobile}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                location === '/routes' ? 'bg-emerald-600 text-white shadow-sm font-bold' : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+              }`}
+            >
+              <Navigation className="w-4 h-4 shrink-0 text-slate-400" />
+              {!isCollapsed && <span className="truncate flex-1">Find Safe Route</span>}
+            </Link>
+
+            <Link
+              href="/nearest-help"
+              onClick={onCloseMobile}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                location === '/nearest-help' ? 'bg-emerald-600 text-white shadow-sm font-bold' : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+              }`}
+            >
+              <PhoneCall className="w-4 h-4 shrink-0 text-slate-400" />
+              {!isCollapsed && <span className="truncate flex-1">Emergency Help</span>}
+            </Link>
+
+            <Link
+              href="/weather"
+              onClick={onCloseMobile}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                location === '/weather' ? 'bg-emerald-600 text-white shadow-sm font-bold' : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+              }`}
+            >
+              <CloudRain className="w-4 h-4 shrink-0 text-slate-400" />
+              {!isCollapsed && <span className="truncate flex-1">Weather & Risk Alerts</span>}
+            </Link>
+
+            <Link
+              href="/reports/track"
+              onClick={onCloseMobile}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                location === '/reports/track' ? 'bg-emerald-600 text-white shadow-sm font-bold' : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+              }`}
+            >
+              <FileText className="w-4 h-4 shrink-0 text-slate-400" />
+              {!isCollapsed && <span className="truncate flex-1">My Reports</span>}
+            </Link>
+
+            <Link
+              href="/profile"
+              onClick={onCloseMobile}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                location === '/profile' ? 'bg-emerald-600 text-white shadow-sm font-bold' : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4 shrink-0 text-slate-400" />
+              {!isCollapsed && <span className="truncate flex-1">Profile</span>}
+            </Link>
+          </div>
+        ) : (
+          /* OFFICER / GOVERNMENT OPERATIONS */
+          <React.Fragment>
+            <div className="space-y-0.5">
+              {!isCollapsed && (
+                <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-3 py-1">
+                  OPERATIONS
+                </div>
+              )}
+
+              <Link
+                href="/map"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/map'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Map className={`w-4 h-4 shrink-0 ${location === '/map' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Map & Routes</span>}
+              </Link>
+
+              <Link
+                href="/routes"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/routes' || location === '/ai-routes'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Navigation className={`w-4 h-4 shrink-0 ${location === '/routes' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">AI Safe Routes</span>}
+              </Link>
+
+              <Link
+                href="/disaster"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/disaster' || location === '/alerts'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Flame className={`w-4 h-4 shrink-0 ${location === '/disaster' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Incidents</span>}
+                {!isCollapsed && criticalIncidentsCount > 0 && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-red-600 text-white">
+                    {criticalIncidentsCount}
+                  </span>
+                )}
+              </Link>
+
+              <Link
+                href="/report"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/report'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <AlertOctagon className={`w-4 h-4 shrink-0 ${location === '/report' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Report Incident</span>}
+              </Link>
+
+              <Link
+                href="/cargo"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/cargo' || location === '/my-cargo'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Truck className={`w-4 h-4 shrink-0 ${location === '/cargo' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Logistics</span>}
+              </Link>
+
+              <Link
+                href="/my-cargo"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/my-cargo' || location === '/track-delivery'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Radio className={`w-4 h-4 shrink-0 ${location === '/my-cargo' || location === '/track-delivery' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Track Delivery</span>}
+              </Link>
+            </div>
+
+            {/* INTELLIGENCE */}
+            <div className="space-y-0.5 pt-2 border-t border-slate-800/80">
+              {!isCollapsed && (
+                <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-3 py-1">
+                  INTELLIGENCE
+                </div>
+              )}
+
+              <Link
+                href="/weather"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/weather'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <CloudRain className={`w-4 h-4 shrink-0 ${location === '/weather' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Weather & Risk</span>}
+              </Link>
+
+              <Link
+                href="/landslide-risk"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/landslide-risk'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Mountain className={`w-4 h-4 shrink-0 ${location === '/landslide-risk' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Landslide Intelligence</span>}
+              </Link>
+
+              <Link
+                href="/flood-risk"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/flood-risk'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Waves className={`w-4 h-4 shrink-0 ${location === '/flood-risk' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Flood Intelligence</span>}
+              </Link>
+            </div>
+
+            {/* MORE */}
+            <div className="space-y-0.5 pt-2 border-t border-slate-800/80">
+              {!isCollapsed && (
+                <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 px-3 py-1">
+                  MORE
+                </div>
+              )}
+
+              <Link
+                href="/helplines"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/helplines'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <PhoneCall className={`w-4 h-4 shrink-0 ${location === '/helplines' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Emergency Directory</span>}
+              </Link>
+
+              <Link
+                href="/reports/track"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/reports/track'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <FileText className={`w-4 h-4 shrink-0 ${location === '/reports/track' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Reports</span>}
+              </Link>
+
+              <Link
+                href="/governance"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/governance'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <ShieldCheck className={`w-4 h-4 shrink-0 ${location === '/governance' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Authority Room</span>}
+              </Link>
+
+              <Link
+                href="/data-sources"
+                onClick={onCloseMobile}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  location === '/data-sources'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+              >
+                <Database className={`w-4 h-4 shrink-0 ${location === '/data-sources' ? 'text-white' : 'text-slate-400'}`} />
+                {!isCollapsed && <span className="truncate flex-1">Sync Center</span>}
+                {!isCollapsed && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-600 text-white">
+                    3
+                  </span>
+                )}
+              </Link>
+            </div>
+          </React.Fragment>
+        )}
 
       </div>
 

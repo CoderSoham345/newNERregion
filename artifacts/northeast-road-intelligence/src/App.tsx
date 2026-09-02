@@ -45,16 +45,47 @@ import { DataSourceMatrixPage } from './pages/DataSourceMatrixPage';
 import { AiAssistantPage } from './pages/AiAssistantPage';
 import { MyProfilePage } from './pages/MyProfilePage';
 import { AssamSmartCorridorPage } from './pages/AssamSmartCorridorPage';
+import { CitizenDashboard } from './pages/CitizenDashboard';
 
 const queryClient = new QueryClient();
 
-// Protected Route Wrapper
-const ProtectedRoute: React.FC<{ component: React.ComponentType<any> }> = ({ component: Component }) => {
+// Protected Route Wrapper with Role Guard
+const ProtectedRoute: React.FC<{ component: React.ComponentType<any>; officerOnly?: boolean }> = ({ component: Component, officerOnly }) => {
   const { userProfile } = useOperating();
   if (!userProfile.isAuthenticated) {
     return <LoginPage />;
   }
+  if (officerOnly && userProfile.role === 'Citizen') {
+    return (
+      <div className="p-8 text-center space-y-4 max-w-md mx-auto mt-16 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl">
+        <div className="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto font-black text-lg">
+          🛡
+        </div>
+        <h2 className="text-lg font-black text-slate-900 dark:text-white">Officer Clearance Required</h2>
+        <p className="text-xs text-slate-600 dark:text-slate-400">
+          This operational console or government control is restricted to verified Field Officers. Citizens can access road status, reporting, and emergency help.
+        </p>
+        <a
+          href="/"
+          className="inline-block px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-md hover:bg-emerald-500 transition-colors"
+        >
+          Return to Citizen Dashboard
+        </a>
+      </div>
+    );
+  }
   return <Component />;
+};
+
+const HomeRoute: React.FC = () => {
+  const { userProfile } = useOperating();
+  if (!userProfile.isAuthenticated) {
+    return <LoginPage />;
+  }
+  if (userProfile.role === 'Citizen') {
+    return <CitizenDashboard />;
+  }
+  return <CommandCenter />;
 };
 
 const AppLayout: React.FC = () => {
@@ -104,12 +135,12 @@ const AppLayout: React.FC = () => {
           <Switch>
             <Route path="/login" component={LoginPage} />
             <Route path="/register" component={RegisterPage} />
-            <Route path="/" component={() => <ProtectedRoute component={CommandCenter} />} />
+            <Route path="/" component={() => <ProtectedRoute component={HomeRoute} />} />
             <Route path="/map" component={() => <ProtectedRoute component={LiveRoadMapPage} />} />
             <Route path="/roads" component={() => <ProtectedRoute component={RoadNetworkPage} />} />
             <Route path="/traffic" component={() => <ProtectedRoute component={TrafficIntelligencePage} />} />
-            <Route path="/states" component={() => <ProtectedRoute component={StateIntelligencePage} />} />
-            <Route path="/districts" component={() => <ProtectedRoute component={DistrictIntelligencePage} />} />
+            <Route path="/states" component={() => <ProtectedRoute component={StateIntelligencePage} officerOnly />} />
+            <Route path="/districts" component={() => <ProtectedRoute component={DistrictIntelligencePage} officerOnly />} />
             <Route path="/weather" component={() => <ProtectedRoute component={WeatherIntelligencePage} />} />
             <Route path="/landslide-risk" component={() => <ProtectedRoute component={LandslideRiskPage} />} />
             <Route path="/flood-risk" component={() => <ProtectedRoute component={FloodRiskPage} />} />
@@ -120,25 +151,25 @@ const AppLayout: React.FC = () => {
             <Route path="/assam-corridor" component={() => <ProtectedRoute component={AssamSmartCorridorPage} />} />
             <Route path="/pilot-corridor" component={() => <ProtectedRoute component={AssamSmartCorridorPage} />} />
             <Route path="/ai-assistant" component={() => <ProtectedRoute component={AiAssistantPage} />} />
-            <Route path="/cargo" component={() => <ProtectedRoute component={CargoReadinessPage} />} />
-            <Route path="/vehicles" component={() => <ProtectedRoute component={LiveVehiclesPage} />} />
-            <Route path="/my-cargo" component={() => <ProtectedRoute component={MyCargoPage} />} />
-            <Route path="/track-delivery" component={() => <ProtectedRoute component={MyCargoPage} />} />
+            <Route path="/cargo" component={() => <ProtectedRoute component={CargoReadinessPage} officerOnly />} />
+            <Route path="/vehicles" component={() => <ProtectedRoute component={LiveVehiclesPage} officerOnly />} />
+            <Route path="/my-cargo" component={() => <ProtectedRoute component={MyCargoPage} officerOnly />} />
+            <Route path="/track-delivery" component={() => <ProtectedRoute component={MyCargoPage} officerOnly />} />
             <Route path="/disaster" component={() => <ProtectedRoute component={DisasterIntelligencePage} />} />
             <Route path="/alerts" component={() => <ProtectedRoute component={AlertCenterPage} />} />
             <Route path="/report" component={() => <ProtectedRoute component={ReportIncidentPage} />} />
             <Route path="/reports/track" component={() => <ProtectedRoute component={CitizenReportsTrackingPage} />} />
-            <Route path="/governance" component={() => <ProtectedRoute component={GovernancePage} />} />
+            <Route path="/governance" component={() => <ProtectedRoute component={GovernancePage} officerOnly />} />
             <Route path="/nearest-help" component={() => <ProtectedRoute component={NearestHelpPage} />} />
             <Route path="/help-near-me" component={() => <ProtectedRoute component={HelpNearMePage} />} />
             <Route path="/nearest-services" component={() => <ProtectedRoute component={NearestServicesPage} />} />
             <Route path="/emergency-services" component={() => <ProtectedRoute component={NearestServicesPage} />} />
             <Route path="/helplines" component={() => <ProtectedRoute component={EmergencyHelplinesPage} />} />
             <Route path="/profile" component={() => <ProtectedRoute component={MyProfilePage} />} />
-            <Route path="/data-sources" component={() => <ProtectedRoute component={DataSourceMatrixPage} />} />
-            <Route path="/compare" component={() => <ProtectedRoute component={StateComparisonPage} />} />
-            <Route path="/audit" component={() => <ProtectedRoute component={AuditLogPage} />} />
-            <Route component={() => <ProtectedRoute component={CommandCenter} />} />
+            <Route path="/data-sources" component={() => <ProtectedRoute component={DataSourceMatrixPage} officerOnly />} />
+            <Route path="/compare" component={() => <ProtectedRoute component={StateComparisonPage} officerOnly />} />
+            <Route path="/audit" component={() => <ProtectedRoute component={AuditLogPage} officerOnly />} />
+            <Route component={() => <ProtectedRoute component={HomeRoute} />} />
           </Switch>
         </main>
       </div>

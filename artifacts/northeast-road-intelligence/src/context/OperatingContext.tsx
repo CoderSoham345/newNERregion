@@ -61,7 +61,8 @@ export type UserRole =
   | 'Emergency Responder'
   | 'Transporter'
   | 'Administrator'
-  | 'Citizen / Viewer';
+  | 'Citizen / Viewer'
+  | 'Citizen';
 
 export interface UserProfile {
   id?: string;
