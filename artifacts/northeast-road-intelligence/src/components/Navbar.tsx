@@ -38,12 +38,22 @@ import { LoginModal } from './LoginModal';
 import { AiAssistantModal } from './AiAssistantModal';
 
 interface NavbarProps {
-  onOpenMobileMenu?: () => void;
+  onToggleSidebar?: () => void;
+  onToggleMobileMenu?: () => void;
+  isSidebarCollapsed?: boolean;
+  isMobileSidebarOpen?: boolean;
   onOpenSystemHealth?: () => void;
   onOpenAuditLog?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, onOpenSystemHealth, onOpenAuditLog }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  onToggleSidebar,
+  onToggleMobileMenu,
+  isSidebarCollapsed = false,
+  isMobileSidebarOpen = false,
+  onOpenSystemHealth,
+  onOpenAuditLog,
+}) => {
   const {
     currentLanguage,
     setLanguage,
@@ -195,16 +205,22 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMobileMenu, onOpenSystemHe
         )}
 
         <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
-          {/* Left: Mobile Menu Toggle & Brand Identity */}
+          {/* Left: Menu Toggle & Brand Identity */}
           <div className="flex items-center gap-3">
-            {onOpenMobileMenu && (
-              <button
-                onClick={onOpenMobileMenu}
-                className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-            )}
+            <button
+              onClick={() => {
+                if (window.innerWidth >= 1024) {
+                  onToggleSidebar?.();
+                } else {
+                  onToggleMobileMenu?.();
+                }
+              }}
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMobileSidebarOpen || !isSidebarCollapsed}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
 
             <Link href="/" className="flex items-center gap-2.5 group">
               <div className="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black shadow-xs tracking-tight">

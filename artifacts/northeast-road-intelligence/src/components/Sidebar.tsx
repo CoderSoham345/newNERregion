@@ -30,12 +30,15 @@ import {
 
 interface SidebarProps {
   collapsed?: boolean;
+  onToggleCollapse?: () => void;
   isOpenMobile?: boolean;
   onCloseMobile?: () => void;
   onOpenAiAssistant?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
+  collapsed = false,
+  onToggleCollapse,
   isOpenMobile = false,
   onCloseMobile,
 }) => {
@@ -49,7 +52,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     logoutUser,
   } = useOperating();
 
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const isCollapsed = collapsed !== undefined ? collapsed : internalCollapsed;
+  const handleToggleCollapse = onToggleCollapse || (() => setInternalCollapsed(prev => !prev));
 
   return (
     <aside
@@ -171,15 +176,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </Link>
 
           <Link
-            href="/vehicles"
+            href="/my-cargo"
             onClick={onCloseMobile}
             className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-              location === '/vehicles'
+              location === '/my-cargo' || location === '/track-delivery'
                 ? 'bg-emerald-600 text-white shadow-sm font-bold'
                 : 'hover:bg-slate-800 text-slate-300 hover:text-white'
             }`}
           >
-            <Radio className={`w-4 h-4 shrink-0 ${location === '/vehicles' ? 'text-white' : 'text-slate-400'}`} />
+            <Radio className={`w-4 h-4 shrink-0 ${location === '/my-cargo' || location === '/track-delivery' ? 'text-white' : 'text-slate-400'}`} />
             {!isCollapsed && <span className="truncate flex-1">Track Delivery</span>}
           </Link>
         </div>
@@ -315,7 +320,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               All Systems Operational
             </div>
             <button
-              onClick={() => setIsCollapsed(true)}
+              onClick={handleToggleCollapse}
               className="w-full mt-1 px-3 py-1.5 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             >
               <ChevronsLeft className="w-3.5 h-3.5" />
@@ -324,7 +329,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </>
         ) : (
           <button
-            onClick={() => setIsCollapsed(false)}
+            onClick={handleToggleCollapse}
             title="Expand Sidebar"
             className="w-full p-2 rounded-xl bg-slate-700/60 hover:bg-slate-700 text-slate-300 flex items-center justify-center cursor-pointer"
           >

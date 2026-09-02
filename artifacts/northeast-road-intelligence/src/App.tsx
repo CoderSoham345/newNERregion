@@ -59,6 +59,7 @@ const ProtectedRoute: React.FC<{ component: React.ComponentType<any> }> = ({ com
 
 const AppLayout: React.FC = () => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSecondaryMenuOpen, setMobileSecondaryMenuOpen] = useState(false);
   const [floatingAiOpen, setFloatingAiOpen] = useState(false);
   const { emergencyMode, activeProvenanceModal, closeProvenanceModal, userProfile } = useOperating();
@@ -70,13 +71,28 @@ const AppLayout: React.FC = () => {
       }`}
     >
       {/* Top Government Banner & Navigation */}
-      <Navbar onOpenMobileMenu={() => setMobileSecondaryMenuOpen(true)} />
+      <Navbar
+        onToggleSidebar={() => setSidebarCollapsed(prev => !prev)}
+        onToggleMobileMenu={() => setMobileNavOpen(prev => !prev)}
+        isSidebarCollapsed={sidebarCollapsed}
+        isMobileSidebarOpen={mobileNavOpen}
+      />
+
+      {/* Mobile Sidebar Overlay Backdrop */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs transition-opacity"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Main Workspace Body */}
       <div className="flex-1 flex overflow-hidden">
         {/* Desktop Sidebar Nav (Large screens) */}
         {userProfile.isAuthenticated && (
           <Sidebar
+            collapsed={sidebarCollapsed}
             isOpenMobile={mobileNavOpen}
             onCloseMobile={() => setMobileNavOpen(false)}
             onOpenAiAssistant={() => setFloatingAiOpen(true)}
@@ -107,6 +123,7 @@ const AppLayout: React.FC = () => {
             <Route path="/cargo" component={() => <ProtectedRoute component={CargoReadinessPage} />} />
             <Route path="/vehicles" component={() => <ProtectedRoute component={LiveVehiclesPage} />} />
             <Route path="/my-cargo" component={() => <ProtectedRoute component={MyCargoPage} />} />
+            <Route path="/track-delivery" component={() => <ProtectedRoute component={MyCargoPage} />} />
             <Route path="/disaster" component={() => <ProtectedRoute component={DisasterIntelligencePage} />} />
             <Route path="/alerts" component={() => <ProtectedRoute component={AlertCenterPage} />} />
             <Route path="/report" component={() => <ProtectedRoute component={ReportIncidentPage} />} />
