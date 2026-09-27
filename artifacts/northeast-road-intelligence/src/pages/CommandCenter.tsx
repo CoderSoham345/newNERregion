@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useOperating } from '../context/OperatingContext';
 import { STATES_DATA, ALL_STATES, type StateId, type OperatingState } from '../data/statesAndDistricts';
 import {
@@ -9,14 +9,10 @@ import {
   CloudRain,
   AlertTriangle,
   Navigation,
-  PhoneCall,
   Flame,
   ArrowRight,
   TrendingUp,
   MapPin,
-  Clock,
-  CheckCircle2,
-  Bot,
   Mountain,
   Waves,
   Newspaper,
@@ -30,7 +26,6 @@ import {
   Shield,
   HeartPulse,
   Crosshair,
-  ShieldCheck,
 } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { SourceBadge } from '../components/SourceBadge';
@@ -70,25 +65,6 @@ export const CommandCenter: React.FC = () => {
 
   const [, setLocation] = useLocation();
 
-  // Dynamic Live IST Clock (updates every second)
-  const [istTime, setIstTime] = useState(() => {
-    const now = new Date();
-    return now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' IST';
-  });
-  const [istDate, setIstDate] = useState(() => {
-    const now = new Date();
-    return now.toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
-  });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      setIstTime(now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' IST');
-      setIstDate(now.toLocaleDateString('en-IN', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <>
       {/* Mobile-first Android Dedicated Home Screen for screen widths under md (768px) */}
@@ -105,21 +81,8 @@ export const CommandCenter: React.FC = () => {
             <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
               <span>Good morning, N. Sangma 👋</span>
             </h1>
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              <span className="font-semibold">Field Officer</span>
-              <span>•</span>
-              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Online
-              </span>
-            </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-slate-700 dark:text-slate-300 font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-            <span>Tuesday, 02 September 2026</span>
-            <span className="text-slate-400">•</span>
-            <strong className="text-emerald-600 dark:text-emerald-400">{istTime}</strong>
-          </div>
         </div>
 
         {/* 2. KPI ROW (4 Compact Cards) */}
@@ -192,7 +155,7 @@ export const CommandCenter: React.FC = () => {
           <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             WHAT DO YOU WANT TO DO?
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             
             <Link
               href="/routes"
@@ -202,8 +165,7 @@ export const CommandCenter: React.FC = () => {
                 <Navigation className="w-4 h-4" />
               </div>
               <div className="truncate">
-                <div className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Find Safe Route</div>
-                <div className="text-[10px] text-slate-500 truncate">AI-powered routing</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Find Safe Route</div>
               </div>
             </Link>
 
@@ -215,8 +177,7 @@ export const CommandCenter: React.FC = () => {
                 <AlertTriangle className="w-4 h-4" />
               </div>
               <div className="truncate">
-                <div className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Report Incident</div>
-                <div className="text-[10px] text-slate-500 truncate">Report & alert team</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Report Incident</div>
               </div>
             </Link>
 
@@ -228,21 +189,7 @@ export const CommandCenter: React.FC = () => {
                 <Truck className="w-4 h-4" />
               </div>
               <div className="truncate">
-                <div className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Track Delivery</div>
-                <div className="text-[10px] text-slate-500 truncate">Track in real-time</div>
-              </div>
-            </Link>
-
-            <Link
-              href="/helplines"
-              className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-emerald-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/80 hover:border-emerald-500 transition-all flex items-center gap-3 group"
-            >
-              <div className="w-9 h-9 rounded-xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
-                <PhoneCall className="w-4 h-4" />
-              </div>
-              <div className="truncate">
-                <div className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Emergency Help</div>
-                <div className="text-[10px] text-slate-500 truncate">Get instant help</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Track Delivery</div>
               </div>
             </Link>
 
@@ -341,45 +288,6 @@ export const CommandCenter: React.FC = () => {
 
           </div>
 
-        </div>
-
-        {/* 5. OPERATIONAL PIPELINE */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 shadow-xs">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">OPERATIONAL PIPELINE</h2>
-            <Link href="/governance" className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
-              View All
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-              { num: '01', title: 'Detect', val: '12 new alerts', icon: ShieldAlert, color: 'text-red-500' },
-              { num: '02', title: 'Predict', val: 'High risk in 4 districts', icon: CloudRain, color: 'text-amber-500' },
-              { num: '03', title: 'Explain', val: 'AI risk analysis ready', icon: Bot, color: 'text-emerald-500' },
-              { num: '04', title: 'Alert', val: 'CAP & SEOC broadcast', icon: Radio, color: 'text-blue-500' },
-              { num: '05', title: 'Route', val: '8 alternate routes', icon: Navigation, color: 'text-indigo-500' },
-              { num: '06', title: 'Respond', val: 'Teams notified', icon: ShieldCheck, color: 'text-emerald-500' },
-              { num: '07', title: 'Track', val: 'Convoy GPS monitoring', icon: Truck, color: 'text-cyan-500' },
-              { num: '08', title: 'Resolve', val: '5 incidents resolved', icon: CheckCircle2, color: 'text-emerald-600' },
-            ].map((p) => {
-              const IconComp = p.icon;
-              return (
-                <div key={p.num} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/70 flex items-center justify-between">
-                  <div className="flex items-center gap-2.5 truncate">
-                    <div className="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 flex items-center justify-center font-bold text-xs shrink-0">
-                      {p.num}
-                    </div>
-                    <div className="truncate">
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">{p.title}</div>
-                      <div className="text-[10px] text-slate-500 truncate">{p.val}</div>
-                    </div>
-                  </div>
-                  <IconComp className={`w-4 h-4 shrink-0 ${p.color}`} />
-                </div>
-              );
-            })}
-          </div>
         </div>
 
         {/* 6. BOTTOM DATA ROW (Active Incidents, At-Risk Deliveries, Weather & Risk Overview) */}

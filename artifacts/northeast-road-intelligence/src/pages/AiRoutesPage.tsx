@@ -5,7 +5,6 @@ import { MapView } from '../components/MapView';
 import { RoadIntelligenceDrawer } from '../components/RoadIntelligenceDrawer';
 import {
   Navigation,
-  Brain,
   ShieldCheck,
   AlertTriangle,
   Clock,
@@ -23,8 +22,6 @@ import {
   Check,
   Share2,
   Info,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
 
 const MAJOR_CITIES = [
@@ -89,7 +86,6 @@ export const AiRoutesPage: React.FC = () => {
   // Road Blockage & Rerouting Simulation State
   const [isRoadBlocked, setIsRoadBlocked] = useState(true);
   const [selectedRouteApplied, setSelectedRouteApplied] = useState(false);
-  const [showTechnicalModal, setShowTechnicalModal] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
   const handleCalculate = (e: React.FormEvent) => {
@@ -617,99 +613,12 @@ export const AiRoutesPage: React.FC = () => {
                 </div>
                 <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                   <span className="text-[11px] text-red-700 dark:text-red-300 font-semibold">Active Closure</span>
-                  <button
-                    onClick={() => setShowTechnicalModal(true)}
-                    className="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 font-bold rounded-lg text-[11px] cursor-pointer"
-                  >
-                    WHY?
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       )}
-
-      {/* Expandable Technical Layer: [ WHY THIS ROUTE? ] */}
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-md p-6 space-y-4">
-        <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowTechnicalModal(!showTechnicalModal)}>
-          <div className="flex items-center gap-2.5">
-            <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 rounded-xl">
-              <Brain className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Why this route? [ AI Technical Analysis ]
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Click to inspect terrain slope exposure, IMD rainfall index, CWC river flood thresholds, and bridge load verifications.
-              </p>
-            </div>
-          </div>
-
-          <button className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-            {showTechnicalModal ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-          </button>
-        </div>
-
-        {showTechnicalModal && (
-          <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800 animate-in fade-in">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Landslide Exposure</span>
-                </div>
-                <p className="text-slate-600 dark:text-slate-400">
-                  Avoids high-susceptibility shale rock formations in Jaintia Hills. Recommended route passes through stable gneiss ridge.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <Compass className="w-4 h-4 text-blue-600" />
-                  <span>Rainfall & Flood Index</span>
-                </div>
-                <p className="text-slate-600 dark:text-slate-400">
-                  IMD Doppler radar records 18mm rainfall along Route B vs 85mm in southern foothills. CWC river gauges are well below warning level.
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <Truck className="w-4 h-4 text-amber-600" />
-                  <span>Vehicle & Cargo Match</span>
-                </div>
-                <p className="text-slate-600 dark:text-slate-400">
-                  Configured for 16-Ton Multi-Axle Truck carrying Medical Supplies. All 7 bridge crossings verified for &gt;40 ton load capacity.
-                </p>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs flex items-center justify-between">
-              <div>
-                <span className="font-black text-emerald-900 dark:text-emerald-200 uppercase tracking-wider">
-                  AI Routing Confidence Score: 98.4%
-                </span>
-                <p className="text-emerald-800 dark:text-emerald-300 mt-0.5">
-                  Multi-factor optimization weights safety and accessibility as primary objective over minimum distance.
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  navigator.clipboard?.writeText?.(
-                    `[UttarPURV Technical Audit] Route B Confidence: 98.4%. Avoids NH-306 mudslide. Rain 18mm, stable ridge.`
-                  );
-                  alert('Technical audit summary copied to clipboard.');
-                }}
-                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl cursor-pointer"
-              >
-                Copy Audit Log
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Interactive Map & Legend */}
       <div id="map-view-section" className="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-md space-y-3">

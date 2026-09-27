@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useOperating, type UserRole } from '../context/OperatingContext';
-import { ALL_STATES, STATES_DATA, type StateId, type OperatingState } from '../data/statesAndDistricts';
 import { LANGUAGES, type SupportedLanguage } from '../data/translations';
 import {
   Shield,
@@ -15,7 +14,6 @@ import {
   User,
   Activity,
   Layers,
-  MapPin,
   Truck,
   CheckCircle2,
   X,
@@ -26,16 +24,13 @@ import {
   Radio,
   Sliders,
   Sparkles,
-  Bot,
   Clock,
   Menu,
   LogOut,
   Globe,
-  Compass,
 } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { LoginModal } from './LoginModal';
-import { AiAssistantModal } from './AiAssistantModal';
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
@@ -58,10 +53,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     currentLanguage,
     setLanguage,
     t,
-    isCitizenMode,
-    toggleCitizenMode,
-    selectedState,
-    setSelectedState,
     emergencyMode,
     toggleEmergencyMode,
     demoMode,
@@ -115,7 +106,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [alertsDropdownOpen, setAlertsDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [aiModalOpen, setAiModalOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
   const currentLangObj = LANGUAGES.find((l) => l.code === currentLanguage) || LANGUAGES[0];
@@ -167,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-slate-900 text-white border-b border-slate-800 transition-colors shadow-sm">
+      <header className="sticky top-0 z-40 w-full bg-white text-black border-b border-slate-200 transition-colors shadow-sm">
         {/* Top Demo Mode Banner if Enabled */}
         {demoMode && (
           <div className="bg-amber-500 text-slate-950 px-4 py-1 text-xs font-bold flex items-center justify-between">
@@ -204,9 +194,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         )}
 
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
-          {/* Left: Menu Toggle & Brand Identity */}
-          <div className="flex items-center gap-3">
+        <div className="w-full px-2 sm:px-4 h-16 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-12 shrink-0">
             <button
               onClick={() => {
                 if (window.innerWidth >= 1024) {
@@ -215,67 +204,27 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onToggleMobileMenu?.();
                 }
               }}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="shrink-0 p-2 -ml-1 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-800"
               aria-label="Toggle navigation menu"
               aria-expanded={isMobileSidebarOpen || !isSidebarCollapsed}
             >
               <Menu className="w-5 h-5" />
             </button>
 
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-black shadow-xs tracking-tight">
-                <Shield className="w-5 h-5 text-white" />
+            <Link href="/" className="flex items-center gap-1 shrink-0 group">
+              <div className="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center shadow-xs">
+                <Shield className="w-5 h-5" />
               </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="font-black text-base tracking-tight text-white">
-                    UttarPURV
-                  </span>
-                  <span className="bg-emerald-950 text-emerald-300 text-[10px] font-bold px-1.5 py-0.5 rounded border border-emerald-800">
-                    NER-INTEL
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-400 hidden sm:block font-medium truncate max-w-[220px] lg:max-w-none">
-                  {t('brandTagline', 'Northeast India Safety, Road & Disaster Intelligence')}
-                </p>
+              <div className="hidden sm:block">
+                <div className="font-black text-sm tracking-tight text-slate-900">UttarPURV</div>
+                <div className="text-[10px] text-emerald-600 font-medium">Road Map Intelligence</div>
               </div>
             </Link>
+
           </div>
 
-          {/* Center: Global State Selector & Search */}
+          {/* Center: Global Search */}
           <div className="flex items-center gap-2 flex-1 max-w-xl justify-center">
-            {/* Citizen Mode vs Command Center Mode Switch */}
-            <button
-              onClick={toggleCitizenMode}
-              className={`hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
-                isCitizenMode
-                  ? 'bg-amber-950/80 text-amber-300 border-amber-700/80 hover:bg-amber-900'
-                  : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 text-slate-200'
-              }`}
-              title="Toggle between Simplified Citizen Mode and Government Command Center"
-            >
-              <Compass className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{isCitizenMode ? t('citizenMode', 'Citizen Mode') : t('governmentMode', 'Command Center')}</span>
-            </button>
-
-            {/* Operating State Selector */}
-            <div className="relative flex items-center">
-              <MapPin className="w-3.5 h-3.5 absolute left-2.5 text-emerald-400 pointer-events-none" />
-              <select
-                id="global-state-selector"
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value as OperatingState)}
-                className="pl-8 pr-7 py-1.5 bg-slate-800 hover:bg-slate-700/80 text-xs font-bold text-slate-100 rounded-xl border border-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all appearance-none"
-              >
-                {ALL_STATES.map((state) => (
-                  <option key={state} value={state} className="bg-slate-900 text-white">
-                    {state === 'All states' ? `🌐 ${t('allStates', 'All 8 NE States')}` : `📍 ${state}`}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute right-2 text-slate-400 text-[10px]">▼</div>
-            </div>
-
             {/* Global Search Bar */}
             <div className="relative flex-1 hidden md:block">
               <div className="relative">
@@ -289,7 +238,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setSearchOpen(true);
                   }}
                   onFocus={() => setSearchOpen(true)}
-                  className="w-full pl-9 pr-8 py-1.5 text-xs bg-slate-800/80 border border-slate-700 rounded-xl text-slate-100 placeholder-slate-400 focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full pl-9 pr-8 py-1.5 text-xs bg-white border border-slate-300 rounded-xl text-black placeholder-slate-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
                 {searchQuery && (
                   <button
@@ -304,12 +253,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Search Dropdown */}
               {searchOpen && searchQuery.trim().length > 1 && (
                 <div
-                  className="absolute left-0 right-0 top-full mt-1.5 bg-slate-900 rounded-2xl shadow-xl border border-slate-700 p-2 z-50 max-h-96 overflow-y-auto"
+                  className="absolute left-0 right-0 top-full mt-1.5 bg-slate-900 rounded-2xl shadow-xl border border-slate-700 p-4 z-50 max-h-96 overflow-y-auto"
                   onMouseLeave={() => setSearchOpen(false)}
                 >
                   {matchingRoads.length > 0 && (
                     <div className="mb-2">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase px-2 py-1">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase px-2 py-3">
                         Roads & Corridors
                       </div>
                       {matchingRoads.map((r) => (
@@ -381,13 +330,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Right: Live Dynamic IST Clock, AI Assistant Button & Profile */}
+          {/* Right: Live Dynamic IST Clock & Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Language Selector Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700/80 text-xs font-bold text-slate-200 border border-slate-700 flex items-center gap-1.5 cursor-pointer"
+                className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-xs font-bold text-black border border-slate-300 flex items-center gap-1.5 cursor-pointer"
                 title="Change Platform Language"
               >
                 <Globe className="w-3.5 h-3.5 text-emerald-400" />
@@ -435,15 +384,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
               <div className="text-[9px] text-slate-400 font-medium">{istDate}</div>
             </div>
-
-            {/* Floating/Header "Ask UttarPURV AI" Button */}
-            <button
-              onClick={() => setAiModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-            >
-              <Bot className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t('askAiAction', 'Ask UttarPURV AI')}</span>
-            </button>
 
             {/* Notification Bell */}
             <div className="relative">
@@ -557,7 +497,6 @@ export const Navbar: React.FC<NavbarProps> = ({
       <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
 
       {/* AI Assistant Modal */}
-      <AiAssistantModal isOpen={aiModalOpen} onClose={() => setAiModalOpen(false)} />
     </>
   );
 };

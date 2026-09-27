@@ -733,18 +733,6 @@ export const MapView: React.FC<MapViewProps> = ({
               </select>
             )}
 
-            {/* Base Map Style Picker */}
-            <select
-              value={baseMapStyle}
-              onChange={(e) => setBaseMapStyle(e.target.value as BaseMapStyle)}
-              className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200"
-            >
-              <option value="outdoor">MapTiler Topo / Outdoor</option>
-              <option value="streets">MapTiler Streets</option>
-              <option value="hybrid">MapTiler Satellite Hybrid</option>
-              <option value="dark">MapTiler Dataviz Dark</option>
-              <option value="osm">OpenStreetMap Standard</option>
-            </select>
           </div>
 
           {/* Quick Search */}

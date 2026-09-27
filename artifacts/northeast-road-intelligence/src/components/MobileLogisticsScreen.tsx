@@ -18,8 +18,12 @@ import {
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 
-export const MobileLogisticsScreen: React.FC = () => {
-  const { cargoList, inspectCargo, rerouteCargo, demoMode, toggleDemoMode } = useOperating();
+interface MobileLogisticsScreenProps {
+  cargoList: CargoItem[];
+}
+
+export const MobileLogisticsScreen: React.FC<MobileLogisticsScreenProps> = ({ cargoList }) => {
+  const { inspectCargo, rerouteCargo, demoMode, toggleDemoMode } = useOperating();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<'ACTIVE' | 'DELAYED' | 'CRITICAL'>('ACTIVE');
   const [selectedCargoDetail, setSelectedCargoDetail] = useState<CargoItem | null>(null);
