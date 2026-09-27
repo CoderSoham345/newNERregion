@@ -39,7 +39,9 @@ export const CargoReadinessPage: React.FC = () => {
   const [newCarrier, setNewCarrier] = useState('Assam State Logistics');
   const [newWeight, setNewWeight] = useState('8.5 Tons');
 
-  const filteredCargo = cargoList.filter((c) => {
+  const pageCargo = cargoList.slice(0, 4);
+
+  const filteredCargo = pageCargo.filter((c) => {
     if (priorityFilter !== 'all' && c.priority !== priorityFilter) return false;
     if (statusFilter !== 'all' && c.status !== statusFilter) return false;
     if (searchQuery.trim().length > 0) {
@@ -87,7 +89,7 @@ export const CargoReadinessPage: React.FC = () => {
     <>
       {/* Mobile-first Logistics Lifeline Dashboard */}
       <div className="block md:hidden">
-        <MobileLogisticsScreen />
+        <MobileLogisticsScreen cargoList={pageCargo} />
       </div>
 
       {/* Desktop Full Cargo Logistics Grid */}
@@ -102,7 +104,7 @@ export const CargoReadinessPage: React.FC = () => {
             </h1>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Real-time supply corridor safety clearing, priority consignment tracking, and route diversion management for essential medical, food, and fuel lifelines.
+            Priority cargo tracking and safe route management.
           </p>
         </div>
 
@@ -120,28 +122,28 @@ export const CargoReadinessPage: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
           <div className="text-[10px] font-bold text-slate-400 uppercase">Total Shipments</div>
           <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">
-            {cargoList.length}
+            {pageCargo.length}
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
           <div className="text-[10px] font-bold text-slate-400 uppercase">In Transit Clear</div>
           <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
-            {cargoList.filter((c) => c.status === 'In Transit').length}
+            {pageCargo.filter((c) => c.status === 'In Transit').length}
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
           <div className="text-[10px] font-bold text-slate-400 uppercase">At Risk / Delayed</div>
           <div className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">
-            {cargoList.filter((c) => c.status === 'Delayed' || c.status === 'At risk').length}
+            {pageCargo.filter((c) => c.status === 'Delayed' || c.status === 'At risk').length}
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
           <div className="text-[10px] font-bold text-slate-400 uppercase">Critical Blocked</div>
           <div className="text-2xl font-black text-red-600 dark:text-red-400 mt-1">
-            {cargoList.filter((c) => c.status === 'Blocked').length}
+            {pageCargo.filter((c) => c.status === 'Blocked').length}
           </div>
         </div>
       </div>
@@ -254,9 +256,6 @@ export const CargoReadinessPage: React.FC = () => {
                   <div className="text-[11px] text-slate-500">Vehicle: {c.vehicleId}</div>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-[11px] text-slate-600 dark:text-slate-300 mb-4">
-                  <strong>Assessment:</strong> {c.reason}
-                </div>
               </div>
 
               {/* Action Buttons */}

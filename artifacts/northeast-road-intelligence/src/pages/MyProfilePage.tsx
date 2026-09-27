@@ -10,8 +10,6 @@ import {
   CheckCircle2,
   Bell,
   Radio,
-  Moon,
-  Sun,
   ShieldCheck,
   Save,
   LogOut,
@@ -29,10 +27,6 @@ export const MyProfilePage: React.FC = () => {
     userProfile,
     loginUser,
     logoutUser,
-    demoMode,
-    toggleDemoMode,
-    darkMode,
-    toggleDarkMode,
     setSelectedState,
     setSelectedDistrictId,
   } = useOperating();
@@ -132,9 +126,9 @@ export const MyProfilePage: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Left Column: Edit Profile Form */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           <div className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
               <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -337,67 +331,6 @@ export const MyProfilePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Platform Controls */}
-        <div className="space-y-6">
-          {/* Data Honesty Card */}
-          <div className="bg-slate-900 text-white rounded-2xl border border-slate-800 p-5 space-y-3">
-            <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4" />
-              UttarPURV Data Policy
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              UttarPURV is designed with strict data provenance. Real feeds are used for weather (Open-Meteo REST) and basemaps (MapTiler). Historical demographic data explicitly references Census of India.
-            </p>
-            <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-400 space-y-1">
-              <div>• Demographic Source: Census of India / MDoNER</div>
-              <div>• Telemetry Mode: {demoMode ? 'SIMULATED DEMO' : 'LIVE / REAL-DATA FIRST'}</div>
-            </div>
-          </div>
-
-          {/* Quick System Toggles */}
-          <div className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 space-y-4">
-            <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              Platform Mode Controls
-            </h3>
-
-            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-              <div>
-                <div className="text-xs font-bold text-slate-900 dark:text-white">
-                  Evaluation Demo Mode
-                </div>
-                <div className="text-[10px] text-slate-500">
-                  {demoMode ? 'Simulated fleets active' : 'Strict real-data mode'}
-                </div>
-              </div>
-              <button
-                onClick={toggleDemoMode}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
-                  demoMode
-                    ? 'bg-amber-500 text-slate-950 hover:bg-amber-600'
-                    : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
-                }`}
-              >
-                {demoMode ? 'ON' : 'OFF'}
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-              <div>
-                <div className="text-xs font-bold text-slate-900 dark:text-white">Theme Mode</div>
-                <div className="text-[10px] text-slate-500">
-                  {darkMode ? 'Dark Command View' : 'Light Operations View'}
-                </div>
-              </div>
-              <button
-                onClick={toggleDarkMode}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer flex items-center gap-1.5"
-              >
-                {darkMode ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-slate-600" />}
-                <span>{darkMode ? 'Dark' : 'Light'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

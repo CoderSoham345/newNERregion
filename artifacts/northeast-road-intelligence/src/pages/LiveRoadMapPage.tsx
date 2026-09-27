@@ -1,20 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useOperating } from '../context/OperatingContext';
 import { MapView } from '../components/MapView';
 import { RoadIntelligenceDrawer } from '../components/RoadIntelligenceDrawer';
 import { MobileRoadBottomSheet } from '../components/MobileRoadBottomSheet';
-import { ALL_STATES, STATES_DATA, type StateId, type OperatingState } from '../data/statesAndDistricts';
 import {
   Map,
-  Search,
 } from 'lucide-react';
 
 export const LiveRoadMapPage: React.FC = () => {
   const {
-    selectedState,
-    setSelectedState,
-    selectedDistrictId,
-    setSelectedDistrictId,
     filteredRoadSegments,
     selectedRoadSegment,
     inspectRoad,
@@ -22,29 +16,7 @@ export const LiveRoadMapPage: React.FC = () => {
     toggleMapLayer,
   } = useOperating();
 
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-
-  const currentDistricts =
-    selectedState !== 'All states' && STATES_DATA[selectedState as StateId]
-      ? STATES_DATA[selectedState as StateId].districts
-      : [];
-
-  const displaySegments = filteredRoadSegments.filter((seg) => {
-    if (statusFilter !== 'all' && seg.roadStatus !== statusFilter) return false;
-    if (typeFilter !== 'all' && seg.highwayType !== typeFilter) return false;
-    if (searchQuery.trim().length > 0) {
-      const q = searchQuery.toLowerCase();
-      return (
-        seg.highwayNumber.toLowerCase().includes(q) ||
-        seg.startLocation.toLowerCase().includes(q) ||
-        seg.endLocation.toLowerCase().includes(q) ||
-        seg.districtName.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
+  const displaySegments = filteredRoadSegments;
 
   return (
     <div className="p-2 sm:p-6 space-y-3 sm:space-y-4 max-w-7xl mx-auto pb-24 md:pb-6">
@@ -62,35 +34,8 @@ export const LiveRoadMapPage: React.FC = () => {
           </p>
         </div>
 
-        {/* State & District Selectors + Mobile Compact Quick Filter Pill Strip */}
+        {/* Mobile Compact Quick Filter Pill Strip */}
         <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <select
-            value={selectedState}
-            onChange={(e) => setSelectedState(e.target.value as OperatingState)}
-            className="px-2.5 py-1.5 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          >
-            {ALL_STATES.map((st) => (
-              <option key={st} value={st}>
-                {st}
-              </option>
-            ))}
-          </select>
-
-          {currentDistricts.length > 0 && (
-            <select
-              value={selectedDistrictId}
-              onChange={(e) => setSelectedDistrictId(e.target.value)}
-              className="px-2.5 py-1.5 text-xs font-bold rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            >
-              <option value="all">All Districts</option>
-              {currentDistricts.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-          )}
-
           {/* Quick Map Layer Toggles for Mobile Screen */}
           <div className="flex items-center gap-1 overflow-x-auto custom-scrollbar md:hidden">
             <button
@@ -137,41 +82,9 @@ export const LiveRoadMapPage: React.FC = () => {
         {/* Right 1 Col: Segment Explorer & Filter (Hidden on small mobile, visible on desktop/tablet) */}
         <div className="hidden lg:flex bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex-col h-[640px]">
           {/* Filter Bar */}
-          <div className="p-3 border-b border-slate-200 dark:border-slate-800 space-y-2">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Filter road or location..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="flex-1 px-2 py-1 text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
-              >
-                <option value="all">All Statuses</option>
-                <option value="Accessible">Accessible</option>
-                <option value="Caution">Caution</option>
-                <option value="At risk">At risk</option>
-                <option value="Blocked">Blocked</option>
-              </select>
-
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="flex-1 px-2 py-1 text-[11px] font-semibold bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
-              >
-                <option value="all">All Types</option>
-                <option value="NH">National (NH)</option>
-                <option value="SH">State (SH)</option>
-                <option value="MDR">Major District (MDR)</option>
-              </select>
+          <div className="p-3 border-b border-slate-200 dark:border-slate-800">
+            <div className="text-base font-bold text-slate-700 dark:text-slate-200">
+              Live Route Updates
             </div>
           </div>
 
@@ -182,7 +95,7 @@ export const LiveRoadMapPage: React.FC = () => {
                 No road segments match current filters.
               </div>
             ) : (
-              displaySegments.map((seg) => {
+              displaySegments.slice(0, 4).map((seg) => {
                 const isSelected = selectedRoadSegment?.id === seg.id;
                 return (
                   <div
@@ -199,7 +112,7 @@ export const LiveRoadMapPage: React.FC = () => {
                         <span className="px-1.5 py-0.5 rounded bg-slate-900 text-white font-mono text-[10px]">
                           {seg.highwayNumber}
                         </span>
-                        <span className="truncate max-w-[150px]">
+                        <span className="truncate max-w-37.5">
                           {seg.startLocation} → {seg.endLocation}
                         </span>
                       </div>

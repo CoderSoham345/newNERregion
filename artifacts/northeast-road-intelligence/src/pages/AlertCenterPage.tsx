@@ -28,7 +28,7 @@ export const AlertCenterPage: React.FC = () => {
 
       {/* Alert Feed */}
       <div className="space-y-3">
-        {alerts.map((alt) => {
+        {alerts.slice(0, 4).map((alt) => {
           const isCritical = alt.severity === 'Critical';
 
           return (

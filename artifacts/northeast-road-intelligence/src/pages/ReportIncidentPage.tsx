@@ -194,36 +194,36 @@ export const ReportIncidentPage: React.FC = () => {
       </div>
 
       {/* Desktop Comprehensive Incident Management View */}
-      <div className="hidden md:block p-4 sm:p-6 space-y-6 max-w-4xl mx-auto pb-16">
+      <div className="hidden md:block p-4 sm:p-6 space-y-6 max-w-6xl mx-auto pb-16">
         {/* Header */}
         <div className="bg-slate-900 text-white p-6 rounded-2xl border border-slate-800 shadow-md">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-2.5 py-0.5 rounded text-[11px] font-black bg-red-600 text-white tracking-wider">
-                FIELD PROBLEM & DISASTER LODGEMENT
-              </span>
-              <SourceBadge status="field_report" confidence="unverified" />
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded text-[11px] font-black bg-red-600 text-white tracking-wider">
+                  FIELD PROBLEM & DISASTER LODGEMENT
+                </span>
+                <SourceBadge status="field_report" confidence="unverified" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-white mt-1.5">
+                {t('reportTitle')}
+              </h1>
+              <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+                {t('reportSubtitle')}
+              </p>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white mt-1.5">
-              {t('reportTitle')}
-            </h1>
-            <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-              {t('reportSubtitle')}
-            </p>
-          </div>
 
-          <div className="shrink-0 flex items-center gap-2">
-            <Link
-              href="/my-reports"
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-colors"
-            >
-              <Clock className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{t('navMyReports')}</span>
-            </Link>
+            <div className="shrink-0 flex items-center gap-2">
+              <Link
+                href="/my-reports"
+                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-colors"
+              >
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{t('navMyReports')}</span>
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
 
       {/* Success Modal / Banner */}
       {generatedTrackingId ? (
@@ -270,25 +270,25 @@ export const ReportIncidentPage: React.FC = () => {
         /* The Report Form */
         <form
           onSubmit={handleSubmit}
-          className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs space-y-6"
+          className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 shadow-xs space-y-6"
         >
           {/* Section 1: Problem Category */}
           <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+            <label className="text-sm font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-red-500" />
-              <span>1. {t('problemType')}</span>
+              <span>1. Problem Type</span>
             </label>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {[
-                { id: 'Landslide', label: t('problemLandslide'), icon: '⛰️' },
-                { id: 'Flood', label: t('problemFlood'), icon: '🌊' },
-                { id: 'Broken Road', label: t('problemBrokenRoad'), icon: '🚧' },
-                { id: 'Road Blocked', label: t('problemRoadBlocked'), icon: '⛔' },
-                { id: 'Bridge Problem', label: t('problemBridge'), icon: '🌉' },
-                { id: 'Heavy Rain', label: t('problemHeavyRain'), icon: '🌧️' },
-                { id: 'Traffic Problem', label: t('problemTraffic'), icon: '🚗' },
-                { id: 'Other', label: t('problemOther'), icon: '⚠️' },
+                { id: 'Landslide', label: 'Landslide' },
+                { id: 'Flood', label: 'Flood' },
+                { id: 'Broken Road', label: 'Broken Road' },
+                { id: 'Road Blocked', label: 'Road Blocked' },
+                { id: 'Bridge Problem', label: 'Bridge Problem' },
+                { id: 'Heavy Rain', label: 'Heavy Rain' },
+                { id: 'Traffic Problem', label: 'Traffic Problem' },
+                { id: 'Other', label: 'Other' },
               ].map((item) => (
                 <button
                   type="button"
@@ -300,8 +300,7 @@ export const ReportIncidentPage: React.FC = () => {
                       : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300'
                   }`}
                 >
-                  <span className="text-lg">{item.icon}</span>
-                  <span className="text-xs mt-1.5 leading-tight">{item.label}</span>
+                  <span className="text-sm leading-tight">{item.label}</span>
                 </button>
               ))}
             </div>
@@ -309,7 +308,7 @@ export const ReportIncidentPage: React.FC = () => {
 
           {/* Section 2: Location & GPS */}
           <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-            <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+            <label className="text-sm font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-blue-500" />
               <span>2. Location & State Jurisdiction</span>
             </label>
@@ -322,7 +321,7 @@ export const ReportIncidentPage: React.FC = () => {
                 <select
                   value={stateId}
                   onChange={(e) => handleStateChange(e.target.value as StateId)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold"
+                  className="w-full bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white p-3 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold"
                 >
                   {ALL_STATES.map((st) => (
                     <option key={st} value={st}>
@@ -339,7 +338,7 @@ export const ReportIncidentPage: React.FC = () => {
                 <select
                   value={districtId}
                   onChange={(e) => setDistrictId(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold"
+                  className="w-full bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white p-3 rounded-xl border border-slate-200 dark:border-slate-700 font-semibold"
                 >
                   {availableDistricts.map((d) => (
                     <option key={d.id} value={d.id}>
@@ -408,7 +407,7 @@ export const ReportIncidentPage: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t('descriptionPlaceholder')}
-              className="w-full bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white p-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-red-500"
+              className="w-full bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-white p-3 rounded-xl border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-red-500"
               required
             />
           </div>
@@ -528,7 +527,7 @@ export const ReportIncidentPage: React.FC = () => {
           <div className="pt-4 flex items-center justify-end gap-3">
             <button
               type="submit"
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-black text-xs rounded-xl flex items-center gap-2 shadow-lg shadow-red-600/20 transition-all cursor-pointer hover:scale-[1.02]"
+              className="px-7 py-3.5 bg-red-600 hover:bg-red-700 text-white font-black text-sm rounded-xl flex items-center gap-2 shadow-lg shadow-red-600/20 transition-all cursor-pointer hover:scale-[1.02]"
             >
               <Send className="w-4 h-4" />
               <span>{t('submitReport')}</span>

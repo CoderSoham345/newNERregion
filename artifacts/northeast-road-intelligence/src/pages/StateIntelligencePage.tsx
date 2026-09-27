@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useOperating } from '../context/OperatingContext';
-import { ALL_STATES, STATES_DATA, type StateId, type OperatingState } from '../data/statesAndDistricts';
+import { STATES_DATA, type StateId, type OperatingState } from '../data/statesAndDistricts';
 import { type RoadSegment } from '../data/roadNetwork';
 import { MapView } from '../components/MapView';
 import { SourceBadge } from '../components/SourceBadge';
 import {
   Building2,
-  MapPin,
   Route,
   ShieldAlert,
   CheckCircle2,
@@ -136,7 +135,7 @@ export const StateIntelligencePage: React.FC = () => {
 
   return (
     <div className="p-3 sm:p-5 lg:p-6 space-y-5 max-w-7xl mx-auto pb-16">
-      {/* 1. COMMAND HEADER & STATE SELECTOR */}
+      {/* 1. COMMAND HEADER */}
       <div className="bg-slate-900 text-white p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-md">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* State Title & Command Badges */}
@@ -155,26 +154,8 @@ export const StateIntelligencePage: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Controls: State Selector & Mode Switcher */}
+          {/* Quick Controls: Mode Switcher */}
           <div className="flex flex-wrap items-center gap-2.5">
-            {/* Operating State Selector */}
-            <div className="relative flex items-center">
-              <MapPin className="w-3.5 h-3.5 absolute left-3 text-emerald-400 pointer-events-none" />
-              <select
-                id="state-intel-selector"
-                value={selectedState === 'All states' ? 'Assam' : selectedState}
-                onChange={(e) => handleStateChange(e.target.value as OperatingState)}
-                className="pl-8 pr-8 py-2 bg-slate-800 hover:bg-slate-700/80 text-xs font-black text-slate-100 rounded-xl border border-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all appearance-none shadow-xs"
-              >
-                {allStateKeys.map((st) => (
-                  <option key={st} value={st} className="bg-slate-900 text-white">
-                    📍 {st}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute right-3 text-slate-400 text-[10px]">▼</div>
-            </div>
-
             {/* View Switcher: Dashboard vs 8-State Grid */}
             <div className="flex rounded-xl bg-slate-800 p-1 border border-slate-700">
               <button
@@ -338,7 +319,7 @@ export const StateIntelligencePage: React.FC = () => {
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 {/* Embedded Map Canvas */}
                 <MapView
-                  className="h-[460px] sm:h-[520px] lg:h-[560px] w-full"
+                  className="h-115 sm:h-130 lg:h-140 w-full"
                   showSearchHeader={false}
                   showLayerPanel={true}
                 />
@@ -448,7 +429,7 @@ export const StateIntelligencePage: React.FC = () => {
                         className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 hover:border-amber-500 transition-all cursor-pointer space-y-1 group"
                       >
                         <div className="flex items-center justify-between text-xs">
-                          <span className="font-bold text-slate-900 dark:text-white truncate max-w-[170px] group-hover:text-amber-500 transition-colors">
+                          <span className="font-bold text-slate-900 dark:text-white truncate max-w-42.5 group-hover:text-amber-500 transition-colors">
                             {inc.title}
                           </span>
                           <span

@@ -167,7 +167,7 @@ export const DisasterIntelligencePage: React.FC = () => {
             </h3>
 
             <div className="space-y-2">
-              {highRiskRoads.map((r) => (
+              {highRiskRoads.slice(0, 3).map((r) => (
                 <div
                   key={r.id}
                   onClick={() => inspectRoad(r.id)}
@@ -218,9 +218,6 @@ export const DisasterIntelligencePage: React.FC = () => {
                       {inc.severity}
                     </span>
                   </div>
-                  <p className="text-[11px] text-red-900 dark:text-red-300 mb-2 line-clamp-2">
-                    {inc.description}
-                  </p>
                   <div className="text-[10px] text-red-800 dark:text-red-400">
                     <strong>Clearance ETA:</strong> {inc.estimatedClearanceTime}
                   </div>

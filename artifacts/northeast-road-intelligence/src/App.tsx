@@ -41,7 +41,6 @@ import { StateIntelligencePage } from './pages/StateIntelligencePage';
 import { DistrictIntelligencePage } from './pages/DistrictIntelligencePage';
 import { StateComparisonPage } from './pages/StateComparisonPage';
 import { AuditLogPage } from './pages/AuditLogPage';
-import { DataSourceMatrixPage } from './pages/DataSourceMatrixPage';
 import { AiAssistantPage } from './pages/AiAssistantPage';
 import { MyProfilePage } from './pages/MyProfilePage';
 import { AssamSmartCorridorPage } from './pages/AssamSmartCorridorPage';
@@ -166,7 +165,6 @@ const AppLayout: React.FC = () => {
             <Route path="/emergency-services" component={() => <ProtectedRoute component={NearestServicesPage} />} />
             <Route path="/helplines" component={() => <ProtectedRoute component={EmergencyHelplinesPage} />} />
             <Route path="/profile" component={() => <ProtectedRoute component={MyProfilePage} />} />
-            <Route path="/data-sources" component={() => <ProtectedRoute component={DataSourceMatrixPage} officerOnly />} />
             <Route path="/compare" component={() => <ProtectedRoute component={StateComparisonPage} officerOnly />} />
             <Route path="/audit" component={() => <ProtectedRoute component={AuditLogPage} officerOnly />} />
             <Route component={() => <ProtectedRoute component={HomeRoute} />} />

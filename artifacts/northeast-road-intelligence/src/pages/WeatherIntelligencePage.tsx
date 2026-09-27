@@ -75,9 +75,9 @@ export const WeatherIntelligencePage: React.FC = () => {
   const activeWeather = activeStation.weather;
 
   // Filter stations based on state selector
-  const visibleStations = selectedState === 'All states'
+  const visibleStations = (selectedState === 'All states'
     ? stations
-    : stations.filter((s) => s.state === selectedState);
+    : stations.filter((s) => s.state === selectedState)).slice(0, 4);
 
   return (
     <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
@@ -99,9 +99,6 @@ export const WeatherIntelligencePage: React.FC = () => {
               onClickInfo={() => inspectDataSource('Weather & Rainfall API')}
             />
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl">
-            Live atmospheric pressure, 24-hour precipitation totals, wind shear, and slope moisture indices retrieved directly from Open-Meteo WMO high-resolution numerical models (no simulated weather).
-          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -211,7 +208,7 @@ export const WeatherIntelligencePage: React.FC = () => {
           <span className="text-xs text-slate-500">Click any card to load comprehensive telemetry</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {visibleStations.map((st) => {
             const originalIndex = stations.findIndex((s) => s.name === st.name);
             const isSelected = originalIndex === selectedStationIndex;
@@ -221,7 +218,7 @@ export const WeatherIntelligencePage: React.FC = () => {
               <div
                 key={st.name}
                 onClick={() => setSelectedStationIndex(originalIndex)}
-                className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                className={`p-5 min-h-44 rounded-2xl border transition-all cursor-pointer ${
                   isSelected
                     ? 'bg-sky-50 dark:bg-sky-950/40 border-sky-500 shadow-md ring-2 ring-sky-400/40'
                     : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-xs'
@@ -229,14 +226,14 @@ export const WeatherIntelligencePage: React.FC = () => {
               >
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <span className="text-[10px] font-bold uppercase text-sky-600 dark:text-sky-400">
+                    <span className="text-xs font-bold uppercase text-sky-600 dark:text-sky-400">
                       {st.state}
                     </span>
-                    <h3 className="font-bold text-xs text-slate-900 dark:text-white leading-tight line-clamp-1">
+                    <h3 className="font-bold text-base text-slate-900 dark:text-white leading-tight line-clamp-2">
                       {st.name}
                     </h3>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-semibold">{st.elevationMeters}m</span>
+                  <span className="text-xs text-slate-500 font-semibold">{st.elevationMeters}m</span>
                 </div>
 
                 {st.isLoading ? (
@@ -247,15 +244,15 @@ export const WeatherIntelligencePage: React.FC = () => {
                 ) : w ? (
                   <div className="space-y-2 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-black text-slate-800 dark:text-slate-200">
+                      <span className="text-sm font-black text-slate-800 dark:text-slate-200">
                         {w.temperature.toFixed(1)}°C
                       </span>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                         {w.weatherDescription}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                       <span>Rain (24h): {w.rainLast24h.toFixed(1)} mm</span>
                       <span>Wind: {w.windSpeed.toFixed(0)} km/h</span>
                     </div>

@@ -74,7 +74,7 @@ export const CitizenDashboard: React.FC = () => {
             Welcome back, {userProfile.name || 'Citizen'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-            Report road hazards, check real-time safety conditions across Northeast India, and access verified emergency assistance instantly.
+            Report road hazards and check real-time safety conditions across Northeast India.
           </p>
           <div className="pt-2 flex flex-wrap items-center gap-3">
             <button
@@ -96,7 +96,7 @@ export const CitizenDashboard: React.FC = () => {
       </div>
 
       {/* Quick Access Action Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <button
           onClick={() => setLocation('/map')}
           className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-emerald-500/50 transition-all text-left space-y-2 group cursor-pointer shadow-xs"
@@ -133,19 +133,6 @@ export const CitizenDashboard: React.FC = () => {
           <div>
             <div className="font-bold text-xs text-slate-900 dark:text-white">Find Safe Route</div>
             <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">AI navigation</div>
-          </div>
-        </button>
-
-        <button
-          onClick={() => setLocation('/nearest-help')}
-          className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl hover:border-emerald-500/50 transition-all text-left space-y-2 group cursor-pointer shadow-xs"
-        >
-          <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Phone className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="font-bold text-xs text-slate-900 dark:text-white">Emergency Help</div>
-            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Helplines & 108</div>
           </div>
         </button>
 
